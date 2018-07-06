@@ -23,29 +23,29 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		switch r.Header.Get("Content-Type") {
-		case "x-www-form-urlencoded":
-			if r.Form.Get("json") != "" {
-				jsonBody := r.Form.Get("json")
+		case "application/x-www-form-urlencoded":
+			r.ParseForm()
 
-				var body map[string]string
+			jsonBody := r.Form.Get("json")
 
-				json.Unmarshal([]byte(jsonBody), &body)
+			var body map[string]string
 
-				if value, ok := body["name"]; ok {
-					userName = value
-				}
+			json.Unmarshal([]byte(jsonBody), &body)
+
+			if value, ok := body["name"]; ok {
+				userName = value
 			}
-		case "multipart/form-data":
-			if r.FormValue("json") != "" {
-				jsonBody := r.FormValue("json")
+		default:
+			r.ParseMultipartForm(1024)
 
-				var body map[string]string
+			jsonBody := r.PostFormValue("json")
 
-				json.Unmarshal([]byte(jsonBody), &body)
+			var body map[string]string
 
-				if value, ok := body["name"]; ok {
-					userName = value
-				}
+			json.Unmarshal([]byte(jsonBody), &body)
+
+			if value, ok := body["name"]; ok {
+				userName = value
 			}
 		}
 	}
@@ -97,17 +97,22 @@ func buyItems(w http.ResponseWriter, r *http.Request) {
 
 	// set itemName
 	switch r.Header.Get("Content-Type") {
-	case "x-www-form-urlencoded":
-		jsonBody := r.Form.Get("json")
+	case "application/x-www-form-urlencoded":
+		r.ParseForm()
+
+		jsonBody := r.PostForm.Get("json")
 
 		var item Item
 		json.Unmarshal([]byte(jsonBody), &item)
 
 		itemName = item.Name
-	case "multipart/form-data":
-		jsonBody := r.FormValue("json")
+	default:
+		r.ParseMultipartForm(1024)
+
+		jsonBody := r.PostFormValue("json")
 
 		var item Item
+
 		json.Unmarshal([]byte(jsonBody), &item)
 
 		itemName = item.Name
