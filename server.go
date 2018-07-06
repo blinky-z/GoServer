@@ -17,7 +17,6 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 
 	var userName string
 
-	// set userName if it exists
 	if r.Method == "GET" {
 		if values, ok := r.URL.Query()["name"]; ok {
 			userName = values[0]
@@ -51,15 +50,14 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// make response body
-	responseBody := map[string]interface{}{}
+	response := map[string]interface{}{}
 
 	if userName != "" {
 		var multiplier = 0
 
 		items := make([]Item, len(userName))
 
-		responseBody["nickname"] = userName
+		response["nickname"] = userName
 		for _, charValue := range userName {
 			multiplier += int(charValue)
 		}
@@ -72,7 +70,7 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 			items[currentItemNumber] = newItem
 		}
 
-		responseBody["items"] = items
+		response["items"] = items
 
 	} else {
 		var multiplier = 30
@@ -87,11 +85,11 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 			items[currentItemNumber] = newItem
 		}
 
-		responseBody["items"] = items
+		response["items"] = items
 	}
 
-	jsonResponseBody, _ := json.Marshal(responseBody)
-	w.Write(jsonResponseBody)
+	jsonResponse, _ := json.Marshal(response)
+	w.Write(jsonResponse)
 }
 
 func buyItems(w http.ResponseWriter, r *http.Request) {
@@ -115,19 +113,19 @@ func buyItems(w http.ResponseWriter, r *http.Request) {
 		itemName = item.Name
 	}
 
-	responseBody := make(map[string]string)
+	response := make(map[string]string)
 
 	successPurchaseMessage := "success"
 	failurePurchaseMessage := "failure"
 
 	if len(itemName)%2 == 0 {
-		responseBody["result"] = successPurchaseMessage
+		response["result"] = successPurchaseMessage
 	} else {
-		responseBody["result"] = failurePurchaseMessage
+		response["result"] = failurePurchaseMessage
 	}
 
-	jsonBody, _ := json.Marshal(responseBody)
-	w.Write(jsonBody)
+	jsonResponse, _ := json.Marshal(response)
+	w.Write(jsonResponse)
 }
 
 func main() {
@@ -136,7 +134,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", getItems)
-	mux.HandleFunc("/buy", getItems)
+	mux.HandleFunc("/buy", buyItems)
 
 	fmt.Printf("listening on port %s", PORT)
 	http.ListenAndServe(":" + PORT, mux)
