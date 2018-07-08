@@ -13,7 +13,7 @@ type Item struct {
 }
 
 func getItems(w http.ResponseWriter, r *http.Request) {
-	const defaultGoodsNumber= 5
+	const defaultGoodsNumber = 5
 
 	var userName string
 
@@ -36,7 +36,7 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 				userName = value
 			}
 		default:
-			r.ParseMultipartForm(1024)
+			r.ParseMultipartForm(2048)
 
 			jsonBody := r.PostFormValue("json")
 
