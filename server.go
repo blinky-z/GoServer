@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"fmt"
+	"time"
 )
 
 type Item struct {
@@ -134,13 +135,17 @@ func buyItems(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	PORT := "8080"
-
 	mux := http.NewServeMux()
+
+	server := &http.Server{ReadTimeout: 5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout: 120 * time.Second,
+		Handler: mux,
+	Addr:"localhost:8080"}
 
 	mux.HandleFunc("/", getItems)
 	mux.HandleFunc("/buy", buyItems)
 
-	fmt.Printf("listening on port %s", PORT)
-	http.ListenAndServe(":" + PORT, mux)
+	fmt.Printf("listening on address %s", server.Addr)
+	server.ListenAndServe()
 }
